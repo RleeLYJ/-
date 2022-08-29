@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:mcv="http://www.springframework.org/schema/mvc"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--SpringMvc扫描控制器-->
+    <context:component-scan base-package="com.warehouse.controller"/>
+    <context:component-scan base-package="com.warehouse.commons"/>
+
+
+    <bean id="templateResolver" class="org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/templates/"/>
+        <property name="suffix" value=".html"/>
+        <property name="templateMode" value="HTML5"/>
+        <property name="cacheable" value="false"/>
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+
+    <bean id="templateEngine" class="org.thymeleaf.spring5.SpringTemplateEngine">
+        <property name="additionalDialects">
+            <set>
+                <bean class="org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect" />
+            </set>
+        </property>
+        <property name="templateResolver" ref="templateResolver"/>
+    </bean>
+    <bean class="org.thymeleaf.spring5.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine"/>
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+    <!--这段代码会使能够直接访问的静态资源无法被controller访问-->
+    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven/>
+
+    <!-- 配置文件上传解析器 -->
+    <!-- id 的值是固定的-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 设置上传文件的最大尺寸为 5MB  默认字节单位
+           8bit=1byte
+           1024byte=1kb
+         -->
+        <property name="maxUploadSize">
+            <value>5242880</value>
+        </property>
+    </bean>
+
+    <security:global-method-security  pre-post-annotations="enabled"/>
+    <aop:aspectj-autoproxy/>
+</beans>

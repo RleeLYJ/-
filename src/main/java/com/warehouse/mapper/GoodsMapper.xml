@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.mapper.GoodsMapper">
+    <select id="findAllGoodsVo" resultType="com.warehouse.pojo.vo.GoodsVo">
+        SELECT bus_goods.*, bus_provider.providername
+        from bus_goods
+                 INNER JOIN bus_provider on bus_goods.providerid = bus_provider.id ${ew.customSqlSegment}
+    </select>
+    <select id="findGoodsByIds" resultType="com.warehouse.pojo.Goods">
+        select * from bus_goods where id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+    <select id="findGoodsByProviderId" resultType="com.warehouse.pojo.Goods">
+        select *
+        from bus_goods
+        where providerid = #{providerid}
+    </select>
+    <select id="findAllWarningGoods" resultType="com.warehouse.pojo.Goods">
+        SELECT * FROM bus_goods ${ew.customSqlSegment}
+    </select>
+</mapper>

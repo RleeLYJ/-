@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+    <!--静态资源全部放开-->
+    <security:http pattern="/resources/**" security="none"/>
+    <security:http pattern="/images/**" security="none"/>
+    <security:http pattern="/upload/**" security="none"/>
+    <security:http auto-config="true" use-expressions="true">
+        <!--登录配置-->
+        <security:form-login login-page="/"
+                             login-processing-url="/login"
+                             authentication-success-handler-ref="loginSuccessHandler"
+                             authentication-failure-handler-ref="loginFailureHandler"/>
+        <security:logout logout-url="/user/logout"  success-handler-ref="logoutSuccessHandler" invalidate-session="true" />
+        <security:custom-filter ref="codeFilter" before="FORM_LOGIN_FILTER"/>
+
+        <!--
+            拦截资源
+            pattern="/**" 拦截所有的资源
+            access="hasAnyRole('role1')" 表示只有role1这个角色可以访问资源
+         -->
+        <security:intercept-url pattern="/" access="permitAll()"/>
+        <security:intercept-url pattern="/login/getCode" access="permitAll()"/>
+        <security:intercept-url pattern="/**" access="!isAnonymous()"/>
+        <!--使用spring的el表达式来指定项目所有资源访问都必须有ROLE_USER或ROLE_ADMIN角色-->
+       <!-- <security:intercept-url pattern="/sales/**" access="hasAnyAuthority()"/>
+        <security:intercept-url pattern="/sales/**" access="hasAnyRole('ROLE_销售管理员','ROLE_超级管理员')"/>
+        <security:intercept-url pattern="/salesback/**" access="hasAnyRole('ROLE_销售管理员','ROLE_超级管理员')"/>
+        <security:intercept-url pattern="/**" access="hasAnyRole('ROLE_超级管理员')"/>-->
+        <security:csrf disabled="true"/>
+        <security:headers >
+            <security:frame-options policy="SAMEORIGIN"/>
+        </security:headers>
+        <security:access-denied-handler error-page="/error/403"/>
+    </security:http>
+
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+    <!-- 设置置Spring Security认证用户来源  noop：SpringSecurity中默认 密码验证是要加密的  noop表示不加密 -->
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userServiceImpl">
+            <security:password-encoder ref="passwordEncoder"/>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+
+
+</beans>

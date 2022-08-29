@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.mapper.UserMapper">
+    <select id="findAllUserVo" resultType="com.warehouse.pojo.vo.UserVo">
+        SELECT a.name as leadername, b.*, sys_dept.name as deptname
+        FROM sys_user as a
+                 INNER JOIN sys_user as b ON a.id = b.mgr
+                 INNER JOIN sys_dept on b.deptid = sys_dept.id ${ew.customSqlSegment};
+    </select>
+    <select id="getUserMaxOrderNum" resultType="integer">
+        select max(ordernum) from sys_user
+    </select>
+    <delete id="deleteUserRoleByUserId">
+        delete from sys_user_role where uid = #{id}
+    </delete>
+    <update id="resetUserPwdById" >
+        update sys_user set pwd = #{password} where id = #{id}
+    </update>
+    <select id="getRoleByUserId" resultType="hashmap">
+        SELECT sys_role.id,sys_role.name,sys_role.remark FROM sys_role INNER JOIN sys_user_role on sys_role.id = sys_user_role.rid where sys_user_role.uid=#{id}
+    </select>
+    <insert id="addUserRoleByUid">
+        insert into sys_user_role
+        <foreach collection="ids" open="values(" separator="),(" close=")" item="id">
+            #{uid},#{id}
+        </foreach>
+    </insert>
+</mapper>

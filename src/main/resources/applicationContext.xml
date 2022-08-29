@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd">    <!--1.扫描包-->
+
+    <context:component-scan base-package="com.warehouse.service , com.warehouse.handler , com.warehouse.filter , com.warehouse.annotation.advice"/>
+    <!--2.加载数据库配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties" file-encoding="UTF-8"/>
+    <!--3.配置数据源 如何连接数据库-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+    <!--4.Spring框架帮MyBatis生成sqlSession MyBatis中的sqlSession交给来了Spring管理-->
+    <bean id="SqlSession" class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--*.xml删除后会报错 要删除可以整段删除-->
+        <!--<property name="mapperLocations" value="classpath*:com/warehouse/mapper/*.xml"/>-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="typeAliasesPackage" value="com.warehouse.pojo"/>
+    </bean>
+    <!--5.spring框架给Mapper层生成对象-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.warehouse.mapper"/>
+    </bean>
+    <!--事务平台管理器 Spring框架管理事务，有一个核心的接口：PlatformTransactionManager 这个接口有很多实现类，其中有一个专门是JDBC事务管理的类：DataSourceTransactionManager-->
+    <!--如果是MyBatis框架，那么事务管理器：DataSourceTransactionManager-->
+    <bean id="transactionManager" class="org.springframework.jdbc.support.JdbcTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <import resource="classpath:spring-security.xml"></import>
+    <!--<tx:advice id="advice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="findUsers"/>
+        </tx:attributes>
+    </tx:advice>
+    &lt;!&ndash;配置切面&ndash;&gt;
+    <aop:config>
+        <aop:pointcut id="pointCut" expression="execution(* com.warehouse.service.*.*(..))"/>
+        <aop:advisor advice-ref="advice" pointcut-ref="pointCut"/>
+    </aop:config>-->
+
+    <bean class="com.google.gson.Gson"></bean>
+    <aop:aspectj-autoproxy/>
+
+</beans>

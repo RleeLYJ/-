@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.mapper.OutportMapper">
+    <select id="findAllOutportVo" resultType="com.warehouse.pojo.vo.OutportVo">
+        SELECT bus_outport.*, bus_provider.providername, bus_goods.goodsname, bus_goods.size
+        FROM bus_outport
+                 INNER JOIN bus_provider on bus_outport.providerid = bus_provider.id
+                 INNER JOIN bus_goods on bus_outport.goodsid = bus_goods.id ${ew.customSqlSegment}
+    </select>
+</mapper>

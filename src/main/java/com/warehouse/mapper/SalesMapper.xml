@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.mapper.SalesMapper">
+    <select id="findAllSalesVo" resultType="com.warehouse.pojo.vo.SalesVo">
+        SELECT bus_sales.*, bus_customer.customername, bus_goods.goodsname, bus_goods.size
+        FROM bus_sales
+                 INNER JOIN bus_customer on bus_sales.customerid = bus_customer.id
+                 INNER JOIN bus_goods on bus_sales.goodsid = bus_goods.id ${ew.customSqlSegment}
+    </select>
+</mapper>

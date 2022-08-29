@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.mapper.PermissionMapper">
+    <select id="findPermissionsByRoleId" resultType="hashmap">
+        SELECT sys_permission.*
+        FROM sys_permission
+                 INNER JOIN sys_role_permission on sys_permission.id = sys_role_permission.pid
+        where sys_role_permission.rid = #{id}
+    </select>
+    <select id="getMenuMaxOrderNum" resultType="integer">
+        select max(ordernum)
+        from sys_permission
+        where type = 'menu';
+    </select>
+    <select id="getPermissionMaxOrderNum" resultType="integer">
+        select max(ordernum)
+        from sys_permission
+        where type = 'perssion';
+    </select>
+    <select id="ifHasBeenUsed" resultType="integer">
+        select count(pid)
+        from sys_role_permission
+        where pid = #{id}
+    </select>
+    <delete id="deleteRolePermissionByPid">
+        delete
+        from sys_role_permission
+        where pid = #{id}
+    </delete>
+    <select id="findPermissionsByUserId" resultType="com.warehouse.pojo.Permission">
+        SELECT DISTINCT
+            sys_permission.*
+        FROM
+            sys_permission
+                INNER JOIN sys_role_permission ON sys_permission.id = sys_role_permission.pid
+                INNER JOIN sys_role ON sys_role_permission.rid = sys_role.id
+                INNER JOIN sys_user_role ON sys_role.id = sys_user_role.rid
+                INNER JOIN sys_user ON sys_user_role.uid = sys_user.id
+        WHERE
+            sys_permission.type = 'menu'
+          AND sys_permission.available = 1
+          AND sys_user.id = #{id}
+    </select>
+    <select id="findUserPermissionsByUserId" resultType="com.warehouse.pojo.Permission">
+        SELECT DISTINCT
+            sys_permission.*
+        FROM
+            sys_permission
+                INNER JOIN sys_role_permission ON sys_permission.id = sys_role_permission.pid
+                INNER JOIN sys_role ON sys_role_permission.rid = sys_role.id
+                INNER JOIN sys_user_role ON sys_role.id = sys_user_role.rid
+                INNER JOIN sys_user ON sys_user_role.uid = sys_user.id
+        WHERE
+            sys_permission.type = 'permission'
+          AND sys_permission.available = 1
+          AND sys_user.id = #{id}
+    </select>
+</mapper>

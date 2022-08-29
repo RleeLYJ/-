@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.warehouse.mapper.RoleMapper">
+    <delete id="deleteRolePermissionByRid">
+        delete from sys_role_permission where rid = #{id}
+    </delete>
+    <delete id="deleteUserRoleByRid">
+        delete from sys_user_role where rid = #{id}
+    </delete>
+    <insert id="saveRolePermissionByRid" >
+        insert into sys_role_permission
+        <foreach collection="ids" separator="),(" open="values(" close=")" item="id">
+            #{rid},#{id}
+        </foreach>
+    </insert>
+    <select id="findRolesByUserId" resultType="com.warehouse.pojo.Role">
+        SELECT
+            `sys_role`.*
+        FROM
+            sys_role
+                INNER JOIN sys_user_role ON sys_user_role.rid = sys_role.id
+                INNER JOIN sys_user ON sys_user_role.uid = sys_user.id
+        WHERE sys_user.id = #{id}
+    </select>
+</mapper>
